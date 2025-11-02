@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Manga Tracker CLI - Enhanced with native image display
+Manga Tracker CLI - try image display
 """
 
 import click
@@ -28,7 +28,6 @@ class MangaTracker:
     def can_display_images(self):
         """Check if we can display images natively"""
         try:
-            # Try to import for image display
             import matplotlib.pyplot as plt
             return True
         except ImportError:
@@ -55,12 +54,11 @@ class MangaTracker:
         """Display image in terminal using system capabilities"""
         system = platform.system()
         try:
-            if system == "Darwin":  # macOS
+            if system == "Darwin":  # mac
                 subprocess.run(["open", image_path], check=True)
             elif system == "Windows":
                 os.startfile(image_path)
             elif system == "Linux":
-                # Try various Linux image viewers
                 for viewer in ["xdg-open", "feh", "display", "eog"]:
                     try:
                         subprocess.run([viewer, image_path], check=True)
@@ -156,7 +154,6 @@ class MangaTracker:
         aspect_ratio = image.height / image.width
         new_height = int(width * aspect_ratio * 0.5)
 
-        # Allow more height for detail
         max_height = 80
         if new_height > max_height:
             new_height = max_height
@@ -165,7 +162,6 @@ class MangaTracker:
         image = image.resize((width, new_height), Image.Resampling.LANCZOS)
         image = image.convert('L')
 
-        # Enhanced character set for better quality
         ascii_chars = ' .\'`^",:;Il!i~+?_][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
 
         pixels = list(image.getdata())
@@ -175,7 +171,7 @@ class MangaTracker:
             if i % width == 0 and i != 0:
                 ascii_str += '\n'
             char_index = int(pixel / 255 * (len(ascii_chars) - 1))
-            ascii_str += ascii_chars[char_index] * 2  # Double width for better aspect
+            ascii_str += ascii_chars[char_index] * 2 
 
         return ascii_str
 
@@ -224,14 +220,12 @@ class MangaTracker:
                 display_success = False
 
                 if display_choice == "1":
-                    # Native display with matplotlib
                     display_success = self.display_image_native(image, i+1)
                     if not display_success:
                         console.print("[yellow]Falling back to ASCII...[/yellow]")
                         display_choice = "4"
 
                 if display_choice == "2":
-                    # Save temp file and open with system viewer
                     temp_path = f"temp_page_{i+1}.png"
                     image.save(temp_path)
                     display_success = self.display_image_terminal(temp_path)
@@ -242,7 +236,6 @@ class MangaTracker:
                         display_choice = "4"
 
                 if display_choice == "3":
-                    # Open in browser
                     display_success = self.display_image_browser(pages[i])
                     if display_success:
                         console.print(f"[green]Opened in browser. Close tab to continue...[/green]")
@@ -251,7 +244,6 @@ class MangaTracker:
                         display_choice = "4"
 
                 if display_choice == "4" or not display_success:
-                    # ASCII fallback
                     ascii_art = self.image_to_ascii_enhanced(image, width=120)
                     console.clear()
                     console.print(Panel(Text(ascii_art, no_wrap=True), border_style="blue", title=f"Page {i+1}"))
@@ -270,7 +262,7 @@ class MangaTracker:
                 console.print(f"[red]Failed to load page {i+1}: {e}[/red]")
                 break
 
-        # Clean up temp files
+        # clean
         for j in range(len(pages)):
             temp_path = f"temp_page_{j+1}.png"
             if os.path.exists(temp_path):
@@ -332,3 +324,4 @@ def search(query, limit):
 
 if __name__ == '__main__':
     cli()
+
